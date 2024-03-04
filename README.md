@@ -1,2 +1,2 @@
-# Transactions-Checker
+# Transactions-Explorer
 Being developed
