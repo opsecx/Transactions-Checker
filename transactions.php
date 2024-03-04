@@ -105,7 +105,27 @@ if ($run_mode == 'transactions') {
  WHERE token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee' AND (source = '$address' OR target = '$address') ORDER BY 5 ASC";
 //  $table_headers = array('date_time1', 'source', 'target', 'amount', 'block_height', 'transaction id'); 
 } elseif ($run_mode == 'connected') {
-  $query = "";
+  $query = "SELECT REPLACE(COALESCE(query1.wallet, query2.wallet),
+    'tnam1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzmefah', 'shielded') as wallet,
+       COALESCE(num_outgoing, 0) as transactions_out,
+       COALESCE(num_incoming, 0) as transactions_in,
+       COALESCE(sum_outgoing, 0) as amount_sent,
+       COALESCE(sum_incoming, 0) as amount_received
+        FROM
+(SELECT source AS wallet, count(amount) as num_incoming,
+        SUM(amount::double precision) AS sum_incoming
+FROM shielded_expedition.tx_transfer
+WHERE target = '$address'
+AND token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee'
+GROUP BY SOURCE) as query2
+FULL JOIN (SELECT target as wallet, count(amount) as num_outgoing,
+            SUM(amount::double precision) AS sum_outgoing
+     FROM shielded_expedition.tx_transfer
+     WHERE source = '$address'
+     AND token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee'
+                                          GROUP BY target) AS query1
+        ON query2.wallet = query1.wallet
+  ORDER BY 5 DESC";
 } elseif ($run_mode == 'num_transfers') {
 	if (empty($range)) {die("internal error");}
 	$range_c = "COALESCE($range, 0)";
