@@ -176,8 +176,8 @@ if ($run_mode === 'transactions') {
   $query3 = "SELECT COUNT(*) AS incoming FROM shielded_expedition.tx_transfer WHERE target = '$address' AND token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee'";
   $query4 = "SELECT SUM(amount::double precision) AS sum_outgoing FROM shielded_expedition.tx_transfer WHERE source = '$address' AND token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee'";
   $query5 = "SELECT SUM(amount::double precision) AS sum_incoming FROM shielded_expedition.tx_transfer WHERE target = '$address' AND token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee'";
-  $query6 = "SELECT COUNT(*) FROM (SELECT target FROM shielded_expedition.tx_transfer WHERE source = '$address' AND target != 'tnam1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzmefah' AND token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee' GROUP BY tx_transfer.target) AS query1";
-  $query7 = "SELECT COUNT(*) FROM (SELECT source FROM shielded_expedition.tx_transfer WHERE target = '$address' AND source != 'tnam1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzmefah' AND token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee' GROUP BY tx_transfer.source) AS query1";
+  $query6 = "SELECT COUNT(*) FROM (SELECT target FROM shielded_expedition.tx_transfer WHERE source = '$address' AND token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee' GROUP BY tx_transfer.target) AS query1";
+  $query7 = "SELECT COUNT(*) FROM (SELECT source FROM shielded_expedition.tx_transfer WHERE target = '$address' AND token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee' GROUP BY tx_transfer.source) AS query1";
   $results2 = pg_query($dbconn, $query2) or die('could not fetch count2');
   $results3 =  pg_query($dbconn, $query3) or die('could not fetch count3');
   $results4 =  pg_query($dbconn, $query4) or die('could not fetch count4');
