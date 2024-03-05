@@ -12,7 +12,7 @@ $run_mode = $mode;
 
 
 //validate all inputs and reset the sht if anyone has tried passing badness
-if ( (!empty($address) and !validate_tnam1($address)) or (!empty($ascdesc) and $ascdesc !== 'asc' and $ascdesc !== 'desc') or (!empty($sort) and $sort !== "5" and $sort !== "2" and $sort !== "3" and $sort !== "4") or ($mode !== 'transactions' and $mode !== 'connected' and $mode !== 'num_transfers' and !empty($mode)) or (!empty($range) and $range !== 'num_incoming' and $range!== 'num_outgoing' and $range !== 'sum_incoming' and $range !== 'sum_outgoing')  ) {
+if ( (!empty($address) and !validate_tnam1($address)) or (!empty($ascdesc) and $ascdesc !== 'asc' and $ascdesc !== 'desc') or (!empty($sort) and $sort !== '5' and $sort !== '2' and $sort !== '3' and $sort !== '4' and $sort !== '6' and $sort !== '7') or ($mode !== 'transactions' and $mode !== 'connected' and $mode !== 'num_transfers' and !empty($mode)) or (!empty($range) and $range !== 'num_incoming' and $range!== 'num_outgoing' and $range !== 'sum_incoming' and $range !== 'sum_outgoing' and $range !== 'wallets_outgoing' and $range !== 'wallets_incoming')  ) {
     $run_mode = 'default';
     $address = '';
     $from = '';
@@ -84,6 +84,8 @@ if (!empty($error)) {
 <option value="3"<?php if($sort==="3") {echo(" selected");} ?>># Transactions Received</option>
 <option value="4"<?php if($sort==="4") {echo(" selected");} ?>>Amount Sent</option>
 <option value="5"<?php if($sort==="5" or empty($sort)) {echo(" selected");} ?>>Amount Received</option>
+<option value="6"<?php if($sort==="6") {echo(" selected");} ?>># Wallets Outgoing</option>
+<option value="7"<?php if($sort==="7") {echo(" selected");} ?>># Wallets Incoming</option>
 </select>
 <select name="ascdesc"><option value="asc"<?php if($ascdesc === 'asc') {echo('selected');}?>>Ascending</option><option value="desc"<?php if ($ascdesc === 'desc' or empty($ascdesc)) {echo(' selected');}?>>Descending</option></select><br> From <input type="text" name="from" value="<?php echo($from);?>"> To <input type="text" name="to" value="<?php echo($to);?>">
 <select name="range">
@@ -91,6 +93,8 @@ if (!empty($error)) {
 <option value="num_incoming"<?php if($range==='num_incoming') {echo(" selected");} ?>># Transactions Received</option>
 <option value="sum_outgoing"<?php if($range==='sum_outgoing') {echo(" selected");} ?>>Amount Sent</option>
 <option value="sum_incoming"<?php if($range==='sum_incoming' or empty($range)) {echo(" selected");} ?>>Amount Received</option>
+<option value="wallets_outgoing"<?php if($range==='wallets_outgoing' or empty($range)) {echo(" selected");} ?>># Wallets Outgoing</option>
+<option value="wallets_incoming"<?php if($range==='wallets_incoming' or empty($range)) {echo(" selected");} ?>># Wallets Incoming</option>
 </select>
 
 <br>
@@ -142,6 +146,8 @@ FULL JOIN (SELECT target as wallet, count(amount) as num_outgoing,
 	elseif ($sort === '3') {$sort_o = "3 $ascdesc, 5 $ascdesc, 1 asc";}
 	elseif ($sort === '4') {$sort_o = "4 $ascdesc, 2 $ascdesc, 1 asc";}
 	elseif ($sort === '5') {$sort_o = "5 $ascdesc, 3 $ascdesc, 1 asc";}
+	elseif ($sort === '6') {$sort_o = "6 $ascdesc, 4 $ascdesc, 1 asc";}
+	elseif ($sort === '7') {$sort_o = "7 $ascdesc, 5 $ascdesc, 1 asc";}
 	else {$sort_o = "$sort $ascdesc";}
 	if(!empty($sort_o)) {$order_clause = "ORDER BY $sort_o";} else {$order_clause = '';}
 	//echo("$order_clause $where_clause");
