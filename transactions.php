@@ -150,12 +150,15 @@ FULL JOIN (SELECT target as wallet, count(amount) as num_outgoing,
        COALESCE(num_outgoing, 0) as num_tx_out,
        COALESCE(num_incoming, 0) as num_tx_in,
        COALESCE(sum_outgoing, 0) as sum_sent,
-       COALESCE(sum_incoming, 0) as sum_received
+       COALESCE(sum_incoming, 0) as sum_received,
+	COALESCE(wallets_outgoing, 0) as wallets_outgoing,
+        COALESCE(wallets_incoming, 0) as wallets_incoming
         FROM
-(SELECT source AS wallet, count(amount) as num_outgoing, SUM(amount::double precision) AS sum_outgoing
+(SELECT source AS wallet, count(amount) as num_outgoing, SUM(amount::double precision) AS sum_outgoing, count(distinct target) as wallets_outgoing
 FROM shielded_expedition.tx_transfer WHERE token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee' GROUP BY SOURCE) as query2
 FULL JOIN (SELECT target as wallet, count(amount) as num_incoming,
-            SUM(amount::double precision) AS sum_incoming
+	    SUM(amount::double precision) AS sum_incoming, 
+	count(distinct source) as wallets_incoming
      FROM shielded_expedition.tx_transfer WHERE token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee' GROUP BY target) AS query1
 	ON query2.wallet = query1.wallet
   $where_clause  
