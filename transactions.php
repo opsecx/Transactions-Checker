@@ -55,6 +55,12 @@ border: 1px solid;
 
 <h2>Transactions Explorer</h2>
 
+<?php
+if (!empty($maintenance)) {
+  echo("<div>Maintenance note: $maintenance</div><br><br>");
+}
+?>
+
 <div>
 This tool lets you check various aspects around transactions. It's based on the indexer database, so results may be limited to what's decoded there.<br><br> 
 Note that only wallets that have conducted at least one transfer will appear in this dataset, so the list is incomplete particularly when it comes to wallets with zero transactions.<br><br>
