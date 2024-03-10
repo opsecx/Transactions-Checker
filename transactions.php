@@ -10,6 +10,11 @@ $sort = strip_all($_GET["sort"]);
 $range = strip_all($_GET["range"]);
 $run_mode = $mode;
 
+// Initialize an empty hash map
+$addressToName = [];
+
+// Load player.csv into an address<->name lookup table
+loadPlayerData();
 
 //validate all inputs and reset the sht if anyone has tried passing badness
 if ( (!empty($address) and !validate_tnam1($address)) or (!empty($ascdesc) and $ascdesc !== 'asc' and $ascdesc !== 'desc') or (!empty($sort) and $sort !== '5' and $sort !== '2' and $sort !== '3' and $sort !== '4' and $sort !== '6' and $sort !== '7') or ($mode !== 'transactions' and $mode !== 'connected' and $mode !== 'num_transfers' and !empty($mode)) or (!empty($range) and $range !== 'num_incoming' and $range!== 'num_outgoing' and $range !== 'sum_incoming' and $range !== 'sum_outgoing' and $range !== 'wallets_outgoing' and $range !== 'wallets_incoming')  ) {
@@ -240,7 +245,7 @@ while ($line = pg_fetch_array($results, null, PGSQL_ASSOC)) {
 	if ($col_value != $address and validate_tnam1($col_value)) {
 	   echo(hyperlink_address($col_value, 'transactions'));
 	} elseif ($col_value == $address) {
-	   echo("<div style=\"color: grey\">$col_value</div>");
+     echo ("<div style=\"color: grey\">$name</div>");
 	} else {
 	  echo($col_value);
 	}
