@@ -245,6 +245,7 @@ while ($line = pg_fetch_array($results, null, PGSQL_ASSOC)) {
 	if ($col_value != $address and validate_tnam1($col_value)) {
 	   echo(hyperlink_address($col_value, 'transactions'));
 	} elseif ($col_value == $address) {
+     $name = getNameFromAddress($address);
      echo ("<div style=\"color: grey\">$name</div>");
 	} else {
 	  echo($col_value);
