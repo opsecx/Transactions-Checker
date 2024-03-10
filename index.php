@@ -1,1 +1,3 @@
-<?php header('Location: transactions.php'); ?>
+<?php 
+
+	header('Location: transactions.php');
