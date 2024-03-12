@@ -22,7 +22,7 @@ function validate_integer($in) {
   if (empty($in)) {
     return false;
   }    
-  strip_all($in);
+  $in = strip_all($in);
   if (strlen($in) > 25) {return false;}
   $reg_int = '/\d+$/i';
   return preg_match($reg_int, $in);
