@@ -12,7 +12,7 @@ $run_mode = $mode;
 
 
 //validate all inputs and reset the sht if anyone has tried passing badness
-if ( (!empty($address) and !validate_tnam1($address)) or (!empty($ascdesc) and $ascdesc !== 'asc' and $ascdesc !== 'desc') or (!empty($sort) and $sort !== '5' and $sort !== '8' and $sort !== '9' and $sort !== '4' and $sort !== '6' and $sort !== '7') or ($mode !== 'transactions' and $mode !== 'connected' and $mode !== 'num_transfers' and !empty($mode)) or (!empty($range) and $range !== 'num_incoming' and $range!== 'num_outgoing' and $range !== 'sum_incoming' and $range !== 'sum_outgoing' and $range !== 'wallets_outgoing' and $range !== 'wallets_incoming')  ) {
+if ( (!empty($address) and !validate_tnam1($address)) or (!empty($ascdesc) and $ascdesc !== 'asc' and $ascdesc !== 'desc') or (!empty($sort) and $sort !== '5' and $sort !== '2' and $sort !== '3' and $sort !== '4' and $sort !== '6' and $sort !== '7') or ($mode !== 'transactions' and $mode !== 'connected' and $mode !== 'num_transfers' and !empty($mode)) or (!empty($range) and $range !== 'num_incoming' and $range!== 'num_outgoing' and $range !== 'sum_incoming' and $range !== 'sum_outgoing' and $range !== 'wallets_outgoing' and $range !== 'wallets_incoming')  ) {
     $run_mode = 'default';
     $address = '';
     $from = '';
@@ -86,12 +86,12 @@ if (!empty($error)) {
 	<button type="submit" name="mode" value="transactions">Check Transactions</button> 
 	<button type="submit" name="mode" value="connected">Check Connected Wallets</button><br><br>
 	Sort by <select name="sort">
-<option value="4"<?php if($sort==="4") {echo(" selected");} ?>># Transactions Sent</option>
-<option value="5"<?php if($sort==="5") {echo(" selected");} ?>># Transactions Received</option>
-<option value="6"<?php if($sort==="6") {echo(" selected");} ?>>Amount Sent</option>
-<option value="7"<?php if($sort==="7" or empty($sort)) {echo(" selected");} ?>>Amount Received</option>
-<option value="8"<?php if($sort==="8") {echo(" selected");} ?>># Wallets Outgoing</option>
-<option value="9"<?php if($sort==="9") {echo(" selected");} ?>># Wallets Incoming</option>
+<option value="2"<?php if($sort==="2") {echo(" selected");} ?>># Transactions Sent</option>
+<option value="3"<?php if($sort==="3") {echo(" selected");} ?>># Transactions Received</option>
+<option value="4"<?php if($sort==="4") {echo(" selected");} ?>>Amount Sent</option>
+<option value="5"<?php if($sort==="5" or empty($sort)) {echo(" selected");} ?>>Amount Received</option>
+<option value="6"<?php if($sort==="6") {echo(" selected");} ?>># Wallets Outgoing</option>
+<option value="7"<?php if($sort==="7") {echo(" selected");} ?>># Wallets Incoming</option>
 </select>
 <select name="ascdesc"><option value="asc"<?php if($ascdesc === 'asc') {echo('selected');}?>>Ascending</option><option value="desc"<?php if ($ascdesc === 'desc' or empty($ascdesc)) {echo(' selected');}?>>Descending</option></select><br> From <input type="text" name="from" value="<?php echo($from);?>"> To <input type="text" name="to" value="<?php echo($to);?>">
 <select name="range">
@@ -111,16 +111,11 @@ if (!empty($error)) {
 //assume $dbconn opened by includes
 
 if ($run_mode == 'transactions') {	
-	$query = "SELECT TO_CHAR(header_time::timestamp, 'YYYY-MM-DD HH24:MI:SS') AS time, 
-COALESCE(players_source.moniker || ' (' || players_source.class || '): ' || REPLACE(source, 'tnam1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzmefah', 'shielded'), REPLACE(source, 'tnam1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzmefah', 'shielded')) AS source, 
-COALESCE(players_target.moniker || ' (' || players_target.class || '): ' || REPLACE(target, 'tnam1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzmefah', 'shielded'),REPLACE(target, 'tnam1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzmefah', 'shielded')) AS target, amount, header_height AS block_height, tx_id AS transaction_id FROM shielded_expedition.tx_transfer LEFT JOIN shielded_expedition.transactions ON tx_transfer.tx_id = shielded_expedition.transactions.hash LEFT JOIN shielded_expedition.blocks ON transactions.block_id = blocks.block_id
-LEFT JOIN tcheck.players players_source ON source = players_source.implicit_address
-LEFT JOIN tcheck.players players_target ON target = players_target.implicit_address
+  $query = "SELECT TO_CHAR(header_time::timestamp, 'YYYY-MM-DD HH24:MI:SS') AS time, REPLACE(source, 'tnam1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzmefah', 'shielded') AS source, REPLACE(target, 'tnam1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzmefah', 'shielded') AS target, amount, header_height AS block_height, tx_id AS transaction_id FROM shielded_expedition.tx_transfer LEFT JOIN shielded_expedition.transactions ON tx_transfer.tx_id = shielded_expedition.transactions.hash LEFT JOIN shielded_expedition.blocks ON transactions.block_id = blocks.block_id
  WHERE token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee' AND (source = '$address' OR target = '$address') ORDER BY 5 ASC";
 //  $table_headers = array('date_time1', 'source', 'target', 'amount', 'block_height', 'transaction id'); 
 } elseif ($run_mode == 'connected') {
-  $query = "SELECT moniker as SE_moniker,
-               class as SE_class, REPLACE(COALESCE(query1.wallet, query2.wallet),
+  $query = "SELECT REPLACE(COALESCE(query1.wallet, query2.wallet),
     'tnam1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzmefah', 'shielded') as wallet,
        COALESCE(num_outgoing, 0) as transactions_out,
        COALESCE(num_incoming, 0) as transactions_in,
@@ -139,10 +134,8 @@ FULL JOIN (SELECT target as wallet, count(amount) as num_outgoing,
      WHERE source = '$address'
      AND token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee'
                                           GROUP BY target) AS query1
-	ON query2.wallet = query1.wallet
-  LEFT JOIN tcheck.players
-  ON query2.wallet = players.implicit_address OR query1.wallet = players.implicit_address
-  ORDER BY 7 DESC";
+        ON query2.wallet = query1.wallet
+  ORDER BY 5 DESC";
 } elseif ($run_mode == 'num_transfers') {
 	if (empty($range)) {die("internal error");}
 	$range_c = "COALESCE($range, 0)";
@@ -155,19 +148,17 @@ FULL JOIN (SELECT target as wallet, count(amount) as num_outgoing,
 	  $where_clause = "WHERE $range_c <= $to";
 	} //if both are empty, where clause will be blank	
 	$sort_o = '';
-	if ($sort === '4') {$sort_o = "4 $ascdesc, 6 $ascdesc, 3 asc";} 
-	elseif ($sort === '5') {$sort_o = "5 $ascdesc, 7 $ascdesc, 3 asc";}
-	elseif ($sort === '6') {$sort_o = "6 $ascdesc, 4 $ascdesc, 3 asc";}
-	elseif ($sort === '7') {$sort_o = "7 $ascdesc, 5 $ascdesc, 3 asc";}
-	elseif ($sort === '8') {$sort_o = "8 $ascdesc, 6 $ascdesc, 3 asc";}
-	elseif ($sort === '9') {$sort_o = "9 $ascdesc, 7 $ascdesc, 3 asc";}
+	if ($sort === '2') {$sort_o = "2 $ascdesc, 4 $ascdesc, 1 asc";} 
+	elseif ($sort === '3') {$sort_o = "3 $ascdesc, 5 $ascdesc, 1 asc";}
+	elseif ($sort === '4') {$sort_o = "4 $ascdesc, 2 $ascdesc, 1 asc";}
+	elseif ($sort === '5') {$sort_o = "5 $ascdesc, 3 $ascdesc, 1 asc";}
+	elseif ($sort === '6') {$sort_o = "6 $ascdesc, 4 $ascdesc, 1 asc";}
+	elseif ($sort === '7') {$sort_o = "7 $ascdesc, 5 $ascdesc, 1 asc";}
 	else {$sort_o = "$sort $ascdesc";}
 	if(!empty($sort_o)) {$order_clause = "ORDER BY $sort_o";} else {$order_clause = '';}
 	//echo("$order_clause $where_clause");
-	$query = "SELECT moniker as SE_moniker,
-	       class as SE_class,
-	REPLACE(COALESCE(query1.wallet, query2.wallet),
-	   'tnam1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzmefah', 'shielded') as wallet,
+   $query = "SELECT REPLACE(COALESCE(query1.wallet, query2.wallet),
+    'tnam1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzmefah', 'shielded') as wallet,
        COALESCE(num_outgoing, 0) as num_tx_out,
        COALESCE(num_incoming, 0) as num_tx_in,
        COALESCE(sum_outgoing, 0) as sum_sent,
@@ -182,8 +173,6 @@ FULL JOIN (SELECT target as wallet, count(amount) as num_incoming,
 	count(distinct source) as wallets_incoming
      FROM shielded_expedition.tx_transfer WHERE token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee' GROUP BY target) AS query1
 	ON query2.wallet = query1.wallet
-  LEFT JOIN tcheck.players
-ON query2.wallet = players.implicit_address
   $where_clause  
   $order_clause";
 }
@@ -201,14 +190,12 @@ if ($run_mode === 'transactions') {
   $query5 = "SELECT SUM(amount::double precision) AS sum_incoming FROM shielded_expedition.tx_transfer WHERE target = '$address' AND token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee'";
   $query6 = "SELECT COUNT(*) FROM (SELECT target FROM shielded_expedition.tx_transfer WHERE source = '$address' AND token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee' GROUP BY tx_transfer.target) AS query1";
   $query7 = "SELECT COUNT(*) FROM (SELECT source FROM shielded_expedition.tx_transfer WHERE target = '$address' AND token = 'tnam1qxvg64psvhwumv3mwrrjfcz0h3t3274hwggyzcee' GROUP BY tx_transfer.source) AS query1";
-  $query8 = "SELECT DISTINCT moniker || ' (' || class || ')' FROM tcheck.players WHERE implicit_address = '$address'";
   $results2 = pg_query($dbconn, $query2) or die('could not fetch count2');
   $results3 =  pg_query($dbconn, $query3) or die('could not fetch count3');
   $results4 =  pg_query($dbconn, $query4) or die('could not fetch count4');
   $results5 =  pg_query($dbconn, $query5) or die('could not fetch count5');
   $results6 =  pg_query($dbconn, $query6) or die('could not fetch count6');
   $results7 =  pg_query($dbconn, $query7) or die('could not fetch count7');
-   $results8 =  pg_query($dbconn, $query8) or die('could not fetch count8');
 
   $sent = pg_fetch_array($results2, null, PGSQL_NUM)[0];
   $received = pg_fetch_array($results3, null, PGSQL_NUM)[0];
@@ -216,12 +203,7 @@ if ($run_mode === 'transactions') {
   $sum_received = pg_fetch_array($results5, null, PGSQL_NUM)[0];
   $wallets_sent = pg_fetch_array($results6, null, PGSQL_NUM)[0];
   $wallets_received = pg_fetch_array($results7, null, PGSQL_NUM)[0];
-  $moniker_class = pg_fetch_array($results8, null, PGSQL_NUM)[0];
 
-  if (!empty($moniker_class)) {
-    echo("SE-moniker/class: $moniker_class<br>");
-  } else { echo("Not a top 4400 SE-participant<br>");
-  }
   echo("Wallet: <span style=\"\">$address</span><br>\n");
   echo("Transactions sent: $sent Transactions received: $received<br>\n");
   echo("Total amount sent: $sum_sent naan Total amount received: $sum_received naan<br>\n");
@@ -255,9 +237,9 @@ while ($line = pg_fetch_array($results, null, PGSQL_ASSOC)) {
     echo "\t<tr>\n";
     foreach ($line as $col_value) {
 	echo("\t\t<td>"); 
-	if (return_part_tnam1($col_value) != $address and return_part_tnam1($col_value) != false) {
+	if ($col_value != $address and validate_tnam1($col_value)) {
 	   echo(hyperlink_address($col_value, 'transactions'));
-	} elseif (return_part_tnam1($col_value) == $address and !empty($address)) {
+	} elseif ($col_value == $address) {
 	   echo("<div style=\"color: grey\">$col_value</div>");
 	} else {
 	  echo($col_value);
