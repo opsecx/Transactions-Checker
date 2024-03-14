@@ -26,7 +26,11 @@ function return_part_tnam1($in) {
   $reg_tnam1 = '/tnam1[a-zA-Z0-9]{40}/i';
   $pattern_matches = '';
   preg_match($reg_tnam1, $in, $pattern_matches);
-  return($pattern_matches[0]);	
+  if (empty($pattern_matches)) {
+     return false;
+  } else {
+     return($pattern_matches[0]);	
+  }
 }
 
 function validate_integer($in) {
@@ -57,7 +61,8 @@ function hyperlink_address($in, $mode_arg) {
    $return_tnam = return_part_tnam1($in);
    if (!$return_tnam) {die('wrong internal parameter call');}
   $uri = strip_all($_SERVER['REQUEST_URI']);
- $uri = array_shift(explode('?', $uri)); 
+  $uri_parts = explode('?', $uri);
+   $uri = array_shift($uri_parts); 
   $servername = strip_all($_SERVER['HTTP_HOST']);
   $newlink = 'https://' . $servername . $uri . '?address=' . $return_tnam . '&mode=' . $mode_arg . '&threshold=&ltgt=gt';
   $returnstring = '<a href="' . $newlink . '" style="text-decoration: none">' . $in . '</a>'; 
