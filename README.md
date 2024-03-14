@@ -3,7 +3,7 @@ First iteration of the Transactions Checker tool, which is basically an attempt 
 # Prerequisites
 1. A working namadexer installation which serves a Postgre SQL database
 2. PHP 8.1+, installed with either Apache or nginx, or another suitable webserver, with Postgre SQL module
-3. Unfortunately, in recent devlopments, the Namadexer team has decided to wholesale delete the table we employ for this project. We are looking to see if this can be remedied somehow, but so far the only solution is to install an older version of Namadexer which has the tx_transfers table, specifically commit ec415ab1cd110c13a7c080e7a2789c6a77ddd62b is the one we use and have developed up against. Obviously it's on our to-do list to change the queries, but this was a very sudden change that was out of our hands (and that we are in communication with the Namadexer team about).
+3. Unfortunately, in recent devlopments, the Namadexer team has decided to wholesale delete the table we employ for this project. We are looking to see if this can be remedied somehow, but so far the only solution is to install an older version of Namadexer which has the tx_transfers table, specifically commit ec415ab1cd110c13a7c080e7a2789c6a77ddd62b is the one we use and have developed up against (git clone -b <commit-hash>). Obviously it's on our to-do list to change the queries, but this was a very sudden change that was out of our hands (and that we are in communication with the Namadexer team about).
 # Installation
 1. Place all php files in the package in the same directory, which is the directory served by your php-enabled webserver
 2. Make sure php actually parses files before proceeding to the next step, as otherwise it could be a big security risk
